@@ -32,8 +32,33 @@ for(const file of COMMAND_FILES) {
 
 
 /*     EVENT HANDLER(s)      */
-client.on('ready', async () => {
+client.once('ready', async () => {
     console.log("ONLINE!")
+})
+
+client.on('message', (message) => {
+
+    console.log(message.content)
+    let args = message.content.split(" ")
+    let author = `<@${message.author}>`
+    if(args[0].startsWith(process.env.PREFIX)) {
+
+        if(message.author.bot) return;
+
+        try {
+            
+            fs.readdirSync("../sdfkljn")
+
+        }
+        catch(e) {
+            console.log(e)
+            message.channel.send(`Command not recognized. Try \`,commands\``)
+        }
+
+
+
+    }
+
 })
 
 client.login(process.env.BOT_TOKEN)
