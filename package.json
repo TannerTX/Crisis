@@ -1,0 +1,25 @@
+{
+  "name": "crisis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TannerTX/Crisis.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TannerTX/Crisis/issues"
+  },
+  "homepage": "https://github.com/TannerTX/Crisis#readme",
+  "dependencies": {
+    "discord.js": "^14.2.0",
+    "dotenv": "^16.0.1",
+    "fs": "^0.0.1-security",
+    "mongoose": "^6.5.2"
+  }
+}
