@@ -28,7 +28,7 @@ for(const file of COMMAND_FILES) {
     const command = require(`./commands/${file}`)
     client.commands.set(command.name, command, command.description, command.usage)
 
-    COMMANDS_EMBED.addFields({name: `${command.name}`, value: `Usage: ${command.usage}\n${command.description}`})
+    COMMANDS_EMBED.addFields({name: `${command.name}`, value: `**𝚄𝚜𝚊𝚐𝚎:** \`${command.usage}\`\n${command.description}`})
 }
 
 module.exports.COMMANDS_EMBED = COMMANDS_EMBED
