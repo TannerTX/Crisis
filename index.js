@@ -9,15 +9,16 @@ const ERROR_CHANNEL_ID = process.env.ERROR_CHANNEL_ID
 const COMMAND_FILES = fs.readdirSync("./commands").filter(file => file.endsWith('.js'))
 client.commands = new Collection()
 
+
 let COMMANDS_EMBED = new EmbedBuilder()
     .setColor("#23ccc6")
     .setTitle("Commands")
     .setAuthor({ name: 'TannerTX', iconURL: 'https://imgur.com/gvBJrqo.png', url: 'https://discord.js.org' })
 
 
-const Mongo_Connection = mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then((result) => {
-console.log("Successfully connected to the database!")
-}).catch((err) => console.log(err))
+// const Mongo_Connection = mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then((result) => {
+// console.log("Successfully connected to the database!")
+// }).catch((err) => console.log(err))
 
 const word = require("./mongooseModels/word.js")
 
@@ -30,13 +31,14 @@ for(const file of COMMAND_FILES) {
     COMMANDS_EMBED.addFields({name: `${command.name}`, value: `Usage: ${command.usage}\n${command.description}`})
 }
 
-
+module.exports.COMMANDS_EMBED = COMMANDS_EMBED
 
 /*     EVENT HANDLER(s)      */
 client.once('ready', async () => {
     console.log("Currently Slapping Brandon's Ass")
     client.user.setActivity(`Slapping Brandon's Ass`);
     client.user.setStatus("dnd");
+    client.channels.cache.get(ERROR_CHANNEL_ID).send({embeds: [COMMANDS_EMBED]})
 })
 
 client.on('messageCreate', (message) => {
