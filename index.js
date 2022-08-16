@@ -1,10 +1,11 @@
 const { Client, GatewayIntentBits, EmbedBuilder, Collection } = require('discord.js');
-const client = new Client({ intents: [GatewayIntentBits.Guilds] }); 
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages] }); 
 const fs = require('fs')
 const mongoose = require('mongoose')
 require('dotenv').config()
 
 /*      GLOBALS       */
+const ERROR_CHANNEL_ID = process.env.ERROR_CHANNEL_ID
 const COMMAND_FILES = fs.readdirSync("./commands").filter(file => file.endsWith('.js'))
 client.commands = new Collection()
 
@@ -24,7 +25,7 @@ const word = require("./mongooseModels/word.js")
 /*      COMMAND DETECTION/CREATION       */
 for(const file of COMMAND_FILES) {
     const command = require(`./commands/${file}`)
-    client.commands.set(command, command.name, command.description, command.usage)
+    client.commands.set(command.name, command, command.description, command.usage)
 
     COMMANDS_EMBED.addFields({name: `${command.name}`, value: `Usage: ${command.usage}\n${command.description}`})
 }
@@ -33,29 +34,32 @@ for(const file of COMMAND_FILES) {
 
 /*     EVENT HANDLER(s)      */
 client.once('ready', async () => {
-    console.log("ONLINE!")
+    console.log("Currently Slapping Brandon's Ass")
+    client.user.setActivity(`Slapping Brandon's Ass`);
+    client.user.setStatus("dnd");
 })
 
-client.on('message', (message) => {
+client.on('messageCreate', (message) => {
 
-    console.log(message.content)
+    if(message.author.bot) return;
+
+    var today = new Date()
+    var date = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`
+    var time = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`
+
     let args = message.content.split(" ")
-    let author = `<@${message.author}>`
+    let author = `${message.author}`
+
     if(args[0].startsWith(process.env.PREFIX)) {
 
-        if(message.author.bot) return;
-
         try {
-            
-            fs.readdirSync("../sdfkljn")
-
+            // Execute command if proper
+            client.commands.get(args[0].toLowerCase().substring(1)).execute(message, args, client)
         }
         catch(e) {
-            console.log(e)
-            message.channel.send(`Command not recognized. Try \`,commands\``)
+             client.channels.cache.get(ERROR_CHANNEL_ID).send(`**Occurrence:** *${date} | ${time}*\n**Output:** ${e}`)
+             message.channel.send(`${author} | Command not recognized. Try \`,commands\` for a list of commands`)
         }
-
-
 
     }
 
