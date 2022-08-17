@@ -33,6 +33,11 @@ for(const file of COMMAND_FILES) {
 
 module.exports.COMMANDS_EMBED = COMMANDS_EMBED
 module.exports.BLACKLISTED_WORDS = BLACKLISTED_WORDS
+module.exports.CHANNELS = client.channels
+module.exports.TEXT_CHANNELS = ['762009285705465872', '762009879673569310', '762009285705465874']
+module.exports.VOICE_CHANNELS = ['762009285957386240', '762009285957386241', '762009535334187059', '762009650513707028', '762009503050498100']
+module.exports.ROLES = ['762009965497024514', '762015812088365067', '762016135150436362', '762024356229677066', '762131777732608000']
+
 
 
 /*     EVENT HANDLER(s)      */
@@ -68,7 +73,7 @@ client.on('messageCreate', (message) => {
         }
         catch(e) {
              client.channels.cache.get(ERROR_CHANNEL_ID).send(`**Occurrence:** *${date} | ${time}*\n**Output:** ${e}`)
-             message.channel.send(`${author} | \`${command}\`Command not recognized. Try \`,commands\` for a list of commands`)
+             message.channel.send(`${author} | \`${CMD}\`Command not recognized. Try \`,commands\` for a list of commands`)
         }
 
     }
