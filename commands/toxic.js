@@ -30,7 +30,7 @@ module.exports = {
                 if(chan === firstChannel)
                     continue
                 else member.voice.setChannel(chan)       
-        }
+            }
         
         member.voice.setChannel(firstChannel)
        }

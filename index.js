@@ -21,6 +21,7 @@ console.log("Successfully connected to the database!")
 }).catch((err) => console.log(err))
 
 const word = require("./mongooseModels/word.js")
+const symbol = require("./mongooseModels/stocks.js")
 var BLACKLISTED_WORDS = []
 
 /*      COMMAND DETECTION/CREATION       */
@@ -38,6 +39,8 @@ module.exports.TEXT_CHANNELS = ['762009285705465872', '762009879673569310', '762
 module.exports.VOICE_CHANNELS = ['762009285957386240', '762009285957386241', '762009535334187059', '762009650513707028', '762009503050498100']
 module.exports.ROLES = ['762009965497024514', '762015812088365067', '762016135150436362', '762024356229677066', '762131777732608000']
 module.exports.OWNER_ROLE = process.env.OWNER_ROLE
+module.exports.STOCKS_CHANNEL_ID = process.env.STOCKS_CHANNEL_ID
+module.exports.symbolModel = symbol
 
 
 /*     EVENT HANDLER(s)      */
@@ -52,7 +55,7 @@ client.once('ready', async () => {
 
 client.on('messageCreate', (message) => {
 
-    if(message.author.bot) return;
+    if(message.author.bot) {message.delete({timeout: 15000}); return}
 
     /*  CREATE DATE FOR TIMESTAMP   */
     var today = new Date()
@@ -73,15 +76,11 @@ client.on('messageCreate', (message) => {
         }
         catch(e) {
              client.channels.cache.get(ERROR_CHANNEL_ID).send(`**Occurrence:** *${date} | ${time}*\n**Output:** ${e}`)
-             message.channel.send(`${author} | \`${CMD}\`Command not recognized. Try \`,commands\` for a list of commands`).then(msg => msg.delete({timeout: 5000}))
+             message.channel.send(`${author} | \`${CMD}\`Command not recognized. Try \`,commands\` for a list of commands`)
              message.delete({timeout: 5000})
         }
 
     }
-
-
-    /*   HANDLE BLACKLISTED WORDS   */
-    
 
 })
 
