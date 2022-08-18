@@ -73,7 +73,8 @@ client.on('messageCreate', (message) => {
         }
         catch(e) {
              client.channels.cache.get(ERROR_CHANNEL_ID).send(`**Occurrence:** *${date} | ${time}*\n**Output:** ${e}`)
-             message.channel.send(`${author} | \`${CMD}\`Command not recognized. Try \`,commands\` for a list of commands`)
+             message.channel.send(`${author} | \`${CMD}\`Command not recognized. Try \`,commands\` for a list of commands`).then(msg => msg.delete({timeout: 5000}))
+             message.delete({timeout: 5000})
         }
 
     }
