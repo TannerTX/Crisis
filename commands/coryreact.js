@@ -7,16 +7,15 @@ module.exports = {
     execute(message, args) {
 
         let MSG_ID = args[1]
-        var SENT = "🏳️‍🌈 🇨 🇴 🇷 🇾 ⚧ 🇱 🇺 🇳 🇩 🇪 🌈"
-        var LETTERS = SENT.split(" ")
-        message.delete()
+        var EMJS = "🏳️‍🌈 🇨 🇴 🇷 🇾 ⚧ 🇱 🇺 🇳 🇩 🇪 🌈".split(" ")
+        // message.delete()
 
         if(!message.member.roles.cache.has(client.OWNER_ROLE)) message.channel.send(`${message.author} | Insufficient Permissions!`)
 
         else if(!message.channel.messages.fetch(MSG_ID)) message.channel.send(`${message.author} | Failed to find Message!`)
 
         else message.channel.messages.fetch(MSG_ID).then(msg => {
-            for(const emj of LETTERS)
+            for(const emj of EMJS)
                 msg.react(emj)
         })
     }

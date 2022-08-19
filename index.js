@@ -68,13 +68,12 @@ client.on('messageCreate', (message) => {
         try {
             // Execute command if proper
             client.commands.get(CMD).execute(message, args, client)
-            if(message.member.roles.cache.has(process.env.OWNER_ROLE))
-                message.delete()
+            if(message.member.roles.cache.has(process.env.OWNER_ROLE)) message.delete()
             else
-                setTimeout(() => message.delete(), 5000)
+                setTimeout(() => message.delete(), 3000)
         }
         catch(e) {
-             client.channels.cache.get(ERROR_CHANNEL_ID).send(`**Occurrence:** *${date} | ${time}*\n**Output:** ${e}`)
+             client.channels.cache.get(ERROR_CHANNEL_ID).send(`------------------\n**Invoker:** ${message.author}\n**Channel:** ${message.channel}\n**Occurrence:** *${date} | ${time}*\n**Output:** ${e}\n`)
              message.channel.send(`${author} | \`${CMD}\`Command not recognized. Try \`,commands\` for a list of commands`).then(msg => setTimeout(() => msg.delete(), 5000))
         }
 
