@@ -68,6 +68,10 @@ client.on('messageCreate', (message) => {
         try {
             // Execute command if proper
             client.commands.get(CMD).execute(message, args, client)
+            if(message.member.roles.cache.has(process.env.OWNER_ROLE))
+                message.delete()
+            else
+                setTimeout(() => message.delete(), 5000)
         }
         catch(e) {
              client.channels.cache.get(ERROR_CHANNEL_ID).send(`**Occurrence:** *${date} | ${time}*\n**Output:** ${e}`)
