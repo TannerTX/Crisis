@@ -4,7 +4,7 @@ const yahooStockPrices = require('yahoo-stock-prices')
 module.exports = {
     name: 'stocks',
     description: 'Manage stock ticker',
-    usage: ',stocks <add, remove>',
+    usage: ',stocks <add, remove> <symbol>',
     execute(message, args) {
 
         var func = args[1].toLowerCase()
