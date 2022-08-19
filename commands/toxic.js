@@ -18,9 +18,9 @@ module.exports = {
 
         if(!message.member.roles.cache.has(client.OWNER_ROLE)) message.channel.send(`${message.author} | Insufficient Permissions!`)
 
-        else if(!member) message.channel.send(`${message.author} | Target user does not exist!`).then(msg => msg.delete({timeout: 5000}))
+        else if(!member) message.channel.send(`${message.author} | Target user does not exist!`)
         
-        else if(!member.voice.channel) message.channel.send(`${message.author} | Target user is not in a voice channel!`).then(msg => msg.delete({timeout: 5000})) 
+        else if(!member.voice.channel) message.channel.send(`${message.author} | Target user is not in a voice channel!`) 
         
         else if (member) {
 

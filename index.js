@@ -22,7 +22,6 @@ console.log("Successfully connected to the database!")
 
 const word = require("./mongooseModels/word.js")
 const symbol = require("./mongooseModels/stocks.js")
-var BLACKLISTED_WORDS = []
 
 /*      COMMAND DETECTION/CREATION       */
 for(const file of COMMAND_FILES) {
@@ -33,7 +32,6 @@ for(const file of COMMAND_FILES) {
 }
 
 module.exports.COMMANDS_EMBED = COMMANDS_EMBED
-module.exports.BLACKLISTED_WORDS = BLACKLISTED_WORDS
 module.exports.CHANNELS = client.channels
 module.exports.TEXT_CHANNELS = ['762009285705465872', '762009879673569310', '762009285705465874']
 module.exports.VOICE_CHANNELS = ['762009285957386240', '762009285957386241', '762009535334187059', '762009650513707028', '762009503050498100']
@@ -48,9 +46,6 @@ client.once('ready', async () => {
     console.log("Currently Slapping Brandon's Ass")
     client.user.setActivity(`Stirring the Pot`);
     client.user.setStatus("dnd");
-    
-    /*   QUERY ALL BLACKLISTED WORDS TO REDUCE DB LOAD   */
-    word.find({}).then(res => res.forEach(item => BLACKLISTED_WORDS.push(item)))
 })
 
 client.on('messageCreate', (message) => {
