@@ -16,11 +16,11 @@ module.exports = {
                                '778851891575652352', // Toxic Free
                                '762009503050498100'] // Minikit Hunting (AFK)
 
-        if(!message.member.roles.cache.has(client.OWNER_ROLE)) message.channel.send(`${message.author} | Insufficient Permissions!`)
+        if(!message.member.roles.cache.has(client.OWNER_ROLE)) message.channel.send(`${message.author} | Insufficient Permissions!`).then(msg => setTimeout(() => msg.delete(), 5000))
 
-        else if(!member) message.channel.send(`${message.author} | Target user does not exist!`)
+        else if(!member) message.channel.send(`${message.author} | Target user does not exist!`).then(msg => setTimeout(() => msg.delete(), 5000))
         
-        else if(!member.voice.channel) message.channel.send(`${message.author} | Target user is not in a voice channel!`) 
+        else if(!member.voice.channel) message.channel.send(`${message.author} | Target user is not in a voice channel!`).then(msg => setTimeout(() => msg.delete(), 5000))
         
         else if (member) {
 

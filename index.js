@@ -50,7 +50,7 @@ client.once('ready', async () => {
 
 client.on('messageCreate', (message) => {
 
-    if(message.author.bot) {message.delete({timeout: 15000}); return}
+    if(message.author.bot) return;
 
     /*  CREATE DATE FOR TIMESTAMP   */
     var today = new Date()
@@ -71,8 +71,7 @@ client.on('messageCreate', (message) => {
         }
         catch(e) {
              client.channels.cache.get(ERROR_CHANNEL_ID).send(`**Occurrence:** *${date} | ${time}*\n**Output:** ${e}`)
-             message.channel.send(`${author} | \`${CMD}\`Command not recognized. Try \`,commands\` for a list of commands`)
-             message.delete({timeout: 5000})
+             message.channel.send(`${author} | \`${CMD}\`Command not recognized. Try \`,commands\` for a list of commands`).then(msg => setTimeout(() => msg.delete(), 5000))
         }
 
     }
