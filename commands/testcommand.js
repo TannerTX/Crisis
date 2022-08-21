@@ -1,4 +1,4 @@
-const bot = require("../index.js")
+const client = require("../index.js")
 
 module.exports = {
     name: 'testcommand',
