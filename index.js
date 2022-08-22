@@ -1,11 +1,12 @@
-const { Client, GatewayIntentBits, EmbedBuilder, Collection } = require('discord.js');
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages] }); 
+const { Client, GatewayIntentBits, EmbedBuilder, Collection, ActivityType } = require('discord.js');
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildPresences] }); 
 const fs = require('fs')
 const mongoose = require('mongoose')
 require('dotenv').config()
 
 /*      GLOBALS       */
 const ERROR_CHANNEL_ID = process.env.ERROR_CHANNEL_ID
+const PRESENCE_UPDATE_CHANNEL_ID = process.env.PRESENCE_CHANNEL_ID
 const COMMAND_FILES = fs.readdirSync("./commands").filter(file => file.endsWith('.js'))
 client.commands = new Collection()
 
@@ -48,6 +49,7 @@ client.once('ready', async () => {
     client.user.setStatus("dnd");
 })
 
+
 client.on('messageCreate', (message) => {
 
     if(message.author.bot) return;
@@ -79,6 +81,39 @@ client.on('messageCreate', (message) => {
 
     }
 
+})
+
+
+client.on('presenceUpdate', (oldMember, newMember) => {
+    
+    const GUILD = newMember.guild
+    const USER = client.users.cache.get(newMember.user.id)
+    var ACTIVITY_LEN = newMember.member.presence.activities.length
+
+    if(newMember.user.bot) return
+
+    if(ACTIVITY_LEN > 0) {
+
+        const ACTIVITY_EMBED = new EmbedBuilder()
+            .setColor("#7842f5")
+            .setTitle(`Activity Update`)
+            .setTimestamp()
+            .setAuthor({ name: `${client.users.cache.get(newMember.user.id).username}`, iconURL: `${USER.displayAvatarURL()}`, url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=1`})
+        
+        for(let i = 0; i < ACTIVITY_LEN; i++) {
+
+            var ACTIVITY = newMember.member.presence.activities[i]
+            
+            ACTIVITY_EMBED.addFields({ name:`${ACTIVITY.name}`, value: `${ACTIVITY.details ? ACTIVITY.details:""} | ${ACTIVITY.state ? ACTIVITY.state:""}` })
+
+            if(ACTIVITY.name.toLowerCase() === "league of legends") {
+                client.channels.cache.get('762009285705465872').send(`Kicked <@${newMember.user.id}> for playing League`)
+                GUILD.members.kick(newMember.user.id, { reason: 'Playing League' })
+            }
+        }
+
+        client.channels.cache.get(PRESENCE_UPDATE_CHANNEL_ID).send({ embeds: [ACTIVITY_EMBED] })
+    }
 })
 
 client.login(process.env.BOT_TOKEN)
