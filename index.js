@@ -1,10 +1,11 @@
 const { Client, GatewayIntentBits, EmbedBuilder, Collection, ActivityType } = require('discord.js');
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildPresences] }); 
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessages] }); 
 const fs = require('fs')
 const mongoose = require('mongoose')
 require('dotenv').config()
 
 /*      GLOBALS       */
+const PREFIX = ','
 const ERROR_CHANNEL_ID = process.env.ERROR_CHANNEL_ID
 const PRESENCE_UPDATE_CHANNEL_ID = process.env.PRESENCE_CHANNEL_ID
 const COMMAND_FILES = fs.readdirSync("./commands").filter(file => file.endsWith('.js'))
@@ -51,7 +52,6 @@ client.once('ready', async () => {
 
 
 client.on('messageCreate', (message) => {
-
     if(message.author.bot) return;
 
     /*  CREATE DATE FOR TIMESTAMP   */
@@ -65,7 +65,7 @@ client.on('messageCreate', (message) => {
     let author = `${message.author}`
 
     /*   EXECUTE COMMAND   */
-    if(args[0].startsWith(process.env.PREFIX)) {
+    if(args[0].startsWith(PREFIX)) {
 
         try {
             // Execute command if proper
