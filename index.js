@@ -45,6 +45,7 @@ module.exports.symbolModel = symbol
 
 /*     EVENT HANDLER(s)      */
 client.once('ready', async () => {
+    console.log(`Owner Role ID: ${process.env.OWNER_ROLE}`)
     console.log("Currently Slapping Brandon's Ass")
     client.user.setActivity(`Stirring the Pot`);
     client.user.setStatus("dnd");
