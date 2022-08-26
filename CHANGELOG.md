@@ -27,4 +27,4 @@
 ## 1.1.2
 ### - WIP -
 - Working on Bot info Command, can't figure out why it isn't working
-- Testing Payload Messaging for Discord
+- Payload Messaging for Discord
