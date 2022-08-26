@@ -23,3 +23,7 @@
 ### - Added presence detection/handling/logging - 
 - Anyone who plays League of Legends gets kicked from the server
 - All presence updates are logged in a server Administration channel
+
+## 1.1.2
+### - WIP -
+- Working on Bot info Command, can't figure out why it isn't working
