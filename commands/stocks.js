@@ -26,7 +26,8 @@ module.exports = {
 
 
         const check_if_symbol_exists = async (s) => client.symbolModel.findOne({ symbol: s }).then(res => {
-                                                    return res ? true : false })
+            return res ? true : false
+        })
 
 
         const DO_WORK = async (func) => {
@@ -34,7 +35,8 @@ module.exports = {
             switch (func) {
 
                 case 'add':
-                    if (await check_if_symbol_exists(sym)) message.channel.send(`${message.author} | Symbol already exists in database!`).then(msg => setTimeout(() => msg.delete(), 5000))
+                    if (await check_if_symbol_exists(sym)) 
+                        message.channel.send(`${message.author} | Symbol already exists in database!`).then(msg => setTimeout(() => msg.delete(), 5000))
 
                     else {
                         if (await check_if_valid_symbol(sym)) {
@@ -57,8 +59,8 @@ module.exports = {
 
                 case 'list':
                     client.symbolModel.find({}).then(res => {
-                        if(!res)
-                        message.channel.send(`Query returned NULL | Database is empty!`).then(msg => setTimeout(() => msg.delete(), 5000))
+                        if (!res)
+                            message.channel.send(`Query returned NULL | Database is empty!`).then(msg => setTimeout(() => msg.delete(), 5000))
                         else {
 
                             const STOCK_EMBED = new EmbedBuilder()
@@ -67,12 +69,12 @@ module.exports = {
 
                             var POS = 1
                             res.forEach(stock => {
-                                 STOCK_EMBED.addFields({name:`**${POS}**. \`${stock.symbol}\``, value:`------------`})
-                                 POS++
+                                STOCK_EMBED.addFields({ name: `**${POS}**. \`${stock.symbol}\``, value: `------------` })
+                                POS++
                             })
                             message.channel.send({ embeds: [STOCK_EMBED] }).then(msg => setTimeout(() => msg.delete(), 25000))
                         }
-                        
+
                     })
                     break
             }
