@@ -1,5 +1,5 @@
-const { Client, GatewayIntentBits, EmbedBuilder, Collection, ActivityType } = require('discord.js');
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessages] }); 
+const { Client, GatewayIntentBits, EmbedBuilder, Collection, ActivityType, Intents } = require('discord.js');
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessages, GatewayIntentBits.Guilds] }); 
 const fs = require('fs')
 const mongoose = require('mongoose')
 require('dotenv').config()
@@ -22,7 +22,7 @@ const Mongo_Connection = mongoose.connect(process.env.DB_URI, { useNewUrlParser:
 console.log("Successfully connected to the database!")
 }).catch((err) => console.log(err))
 
-const word = require("./mongooseModels/word.js")
+/*    MONGOOSE MODELS    */
 const symbol = require("./mongooseModels/stocks.js")
 
 /*      COMMAND DETECTION/CREATION       */
@@ -39,15 +39,29 @@ module.exports.TEXT_CHANNELS = ['762009285705465872', '762009879673569310', '762
 module.exports.VOICE_CHANNELS = ['762009285957386240', '762009285957386241', '762009535334187059', '762009650513707028', '762009503050498100']
 module.exports.ROLES = ['762009965497024514', '762015812088365067', '762016135150436362', '762024356229677066', '762131777732608000']
 module.exports.OWNER_ROLE = process.env.OWNER_ROLE
+module.exports.OWNER_ID = '247557493738176512'
 module.exports.STOCKS_CHANNEL_ID = process.env.STOCKS_CHANNEL_ID
 module.exports.symbolModel = symbol
 
 
 /*     EVENT HANDLER(s)      */
 client.once('ready', async () => {
-    console.log("Currently Slapping Brandon's Ass")
-    client.user.setActivity(`Stirring the Pot`);
+
+    const GUILD = client.guilds.cache.get('762009285705465866')
+    module.exports.GUILD = GUILD
     client.user.setStatus("dnd");
+
+    const STATUS_MESSAGE = [`Prefix: ${PREFIX}`, "Ay Wassup Street", "Hi Brandon", "Gabe Deluca"]
+    let i = 0
+
+    setInterval(() => {
+        if (i < STATUS_MESSAGE.length) {
+            client.user.setActivity(`${STATUS_MESSAGE[i]}`);
+            i++
+        }
+        else i = 0
+    }, 7000)
+
 })
 
 
@@ -89,6 +103,7 @@ client.on('presenceUpdate', (oldMember, newMember) => {
     const GUILD = newMember.guild
     const USER = client.users.cache.get(newMember.user.id)
     var ACTIVITY_LEN = newMember.member.presence.activities.length
+    const PROHIBITED_GAMES = ["league of legends"]
 
     if(newMember.user.bot) return
 
@@ -106,8 +121,8 @@ client.on('presenceUpdate', (oldMember, newMember) => {
             
             ACTIVITY_EMBED.addFields({ name:`${ACTIVITY.name}`, value: `${ACTIVITY.details ? ACTIVITY.details:""} | ${ACTIVITY.state ? ACTIVITY.state:""}` })
 
-            if(ACTIVITY.name.toLowerCase() === "league of legends") {
-                client.channels.cache.get('762009285705465872').send(`Kicked <@${newMember.user.id}> for playing League`)
+            if( PROHIBITED_GAMES.includes(ACTIVITY.name.toLowerCase()) ) {
+                client.channels.cache.get('762009285705465872').send(`**Kicked** <@${newMember.user.id}> for playing ${ACTIVITY.name}`)
                 GUILD.members.kick(newMember.user.id, { reason: 'Playing League' })
             }
         }
