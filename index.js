@@ -103,7 +103,7 @@ client.on('presenceUpdate', (oldMember, newMember) => {
     const GUILD = newMember.guild
     const USER = client.users.cache.get(newMember.user.id)
     var ACTIVITY_LEN = newMember.member.presence.activities.length
-    const PROHIBITED_GAMES = ["league of legends"]
+    const PROHIBITED_GAMES = ["TEMPORARY_PLACEHOLDER"]
 
     if(newMember.user.bot) return
 
