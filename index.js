@@ -46,7 +46,7 @@ module.exports.symbolModel = symbol
 
 /*     EVENT HANDLER(s)      */
 client.once('ready', async () => {
-
+    console.log("Online!")
     const GUILD = client.guilds.cache.get('762009285705465866')
     module.exports.GUILD = GUILD
     client.user.setStatus("dnd");
