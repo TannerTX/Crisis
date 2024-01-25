@@ -7,10 +7,6 @@ module.exports = {
     execute(message) {
         
         
-        const member = message.guild.members.cache.get('170616033902723073')
-        const member2 = message.guild.members.cache.get('288174376392851457')
-        member.kick('Playing League')
-        member2.kick('Playing League')
     }
 
 }

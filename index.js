@@ -108,7 +108,6 @@ client.on('messageCreate', (message) => {
 })
 
 client.on('voiceStateUpdate', (oldState, newState) => {
-
     if (!newState.member || newState.member.user.bot) return;
 
     const now = Date.now();
@@ -120,17 +119,16 @@ client.on('voiceStateUpdate', (oldState, newState) => {
                 totalDeafenedTime: 0,
             });
         }
-    } 
-    
-    else {
-
+    } else {
         if (deafenTimes.has(newState.member.id)) {
             const entry = deafenTimes.get(newState.member.id);
             entry.totalDeafenedTime += now - entry.startTime;
+            entry.startTime = now; // Update startTime
             deafenTimes.set(newState.member.id, entry);
         }
     }
-})
+});
+
 
 
 client.on('presenceUpdate', (oldMember, newMember) => {
@@ -158,9 +156,7 @@ client.on('presenceUpdate', (oldMember, newMember) => {
 
             if( PROHIBITED_GAMES.includes(ACTIVITY.name.toLowerCase()) ) {
                 client.channels.cache.get('762009285705465872').send(`**Kicked** <@${newMember.user.id}> for playing ${ACTIVITY.name}`)
-                GUILD.members.kick(newMember.user.id, { reason: 'Playing League' })
-                GUILD.members.kick('288174376392851457', { reason: 'Playing League' })
-                
+                GUILD.members.kick(newMember.user.id, { reason: 'Playing League' })                
             }
         }
 
