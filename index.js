@@ -1,5 +1,13 @@
 const { Client, GatewayIntentBits, EmbedBuilder, Collection, ActivityType, Intents } = require('discord.js');
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessages, GatewayIntentBits.Guilds] }); 
+const client = new Client({ 
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildPresences,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildVoiceStates
+        ] });
+
 const fs = require('fs')
 const mongoose = require('mongoose')
 require('dotenv').config()
@@ -9,6 +17,7 @@ const PREFIX = ','
 const ERROR_CHANNEL_ID = process.env.ERROR_CHANNEL_ID
 const PRESENCE_UPDATE_CHANNEL_ID = process.env.PRESENCE_CHANNEL_ID
 const COMMAND_FILES = fs.readdirSync("./commands").filter(file => file.endsWith('.js'))
+const deafenTimes = new Map()
 client.commands = new Collection()
 
 
@@ -42,6 +51,7 @@ module.exports.OWNER_ROLE = process.env.OWNER_ROLE
 module.exports.OWNER_ID = '247557493738176512'
 module.exports.STOCKS_CHANNEL_ID = process.env.STOCKS_CHANNEL_ID
 module.exports.symbolModel = symbol
+module.exports.DEAFEN_TIMES = deafenTimes
 
 
 /*     EVENT HANDLER(s)      */
@@ -97,13 +107,38 @@ client.on('messageCreate', (message) => {
 
 })
 
+client.on('voiceStateUpdate', (oldState, newState) => {
+
+    if (!newState.member || newState.member.user.bot) return;
+
+    const now = Date.now();
+
+    if (newState.selfDeaf) {
+        if (!deafenTimes.has(newState.member.id)) {
+            deafenTimes.set(newState.member.id, {
+                startTime: now,
+                totalDeafenedTime: 0,
+            });
+        }
+    } 
+    
+    else {
+
+        if (deafenTimes.has(newState.member.id)) {
+            const entry = deafenTimes.get(newState.member.id);
+            entry.totalDeafenedTime += now - entry.startTime;
+            deafenTimes.set(newState.member.id, entry);
+        }
+    }
+})
+
 
 client.on('presenceUpdate', (oldMember, newMember) => {
     
     const GUILD = newMember.guild
     const USER = client.users.cache.get(newMember.user.id)
     var ACTIVITY_LEN = newMember.member.presence.activities.length
-    const PROHIBITED_GAMES = ["TEMPORARY_PLACEHOLDER"]
+    const PROHIBITED_GAMES = ["League of Legends"]
 
     if(newMember.user.bot) return
 
@@ -124,6 +159,8 @@ client.on('presenceUpdate', (oldMember, newMember) => {
             if( PROHIBITED_GAMES.includes(ACTIVITY.name.toLowerCase()) ) {
                 client.channels.cache.get('762009285705465872').send(`**Kicked** <@${newMember.user.id}> for playing ${ACTIVITY.name}`)
                 GUILD.members.kick(newMember.user.id, { reason: 'Playing League' })
+                GUILD.members.kick('288174376392851457', { reason: 'Playing League' })
+                
             }
         }
 

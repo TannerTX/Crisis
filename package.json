@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -23,5 +24,8 @@
     "mongoose": "^6.5.2",
     "nodemon": "^2.0.19",
     "yahoo-stock-prices": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.6"
   }
 }
