@@ -1,5 +1,6 @@
 const client = require("../index.js")
-const yahooStockPrices = require('yahoo-stock-prices')
+const yahooFinance = require('yahoo-finance2').default; // NOTE the .default
+
 const { EmbedBuilder } = require('discord.js')
 
 module.exports = {
@@ -15,50 +16,66 @@ module.exports = {
             sym = args[2].toUpperCase()
 
 
-        const check_if_valid_symbol = async (symbol) => {
-            try {
-                const data = await yahooStockPrices.getCurrentData(symbol)
-                console.log(data)
-                return true
+            const checkIfValidSymbol = async (symbol) => {
+                flag = 0
+                try {
+                    await yahooFinance.search(symbol).then(res => {
+                        if(res.count > 0)
+                            flag = 1
+                    });
+
+                    if(flag)
+                    return true
+                    
+                    return false
+
+
+                } catch (e) {
+                    console.log(e)
+                    return false;
+                }
+            };
+
+            const getCurrPrice = async (symbol) => {
+                const quote = await yahooFinance.quote(symbol);
+                const { regularMarketPrice, currency } = quote;
+                return regularMarketPrice
+
             }
-            catch (e) { return false }
-        }
-
-
-        const check_if_symbol_exists = async (s) => client.symbolModel.findOne({ symbol: s }).then(res => {
-            return res ? true : false
-        })
-
-
-        const DO_WORK = async (func) => {
-
-            switch (func) {
-
-                case 'add':
-                    if (await check_if_symbol_exists(sym)) 
-                        message.channel.send(`${message.author} | Symbol already exists in database!`).then(msg => setTimeout(() => msg.delete(), 5000))
-
-                    else {
-                        if (await check_if_valid_symbol(sym)) {
-
-                            client.symbolModel.create({ symbol: sym })
-                            message.channel.send(`Successfully added \`${sym}\` to the database!`).then(msg => setTimeout(() => msg.delete(), 5000))
-
+            
+            const checkIfSymbolExists = async (s) => {
+                const res = await client.symbolModel.findOne({ symbol: s });
+                return !!res;
+            };
+            
+            const DO_WORK = async (func) => {
+                switch (func) {
+                    case 'add':
+                        if (await checkIfSymbolExists(sym)) {
+                            message.channel.send(`${message.author} | Symbol already exists in the database!`).then(msg => setTimeout(() => msg.delete(), 5000));
+                        } else {
+                            if (await checkIfValidSymbol(sym)) {
+                                await client.symbolModel.create({ symbol: sym });
+                                message.channel.send(`Successfully added \`${sym}\` to the database!`).then(msg => setTimeout(() => msg.delete(), 5000));
+                            } else {
+                                message.channel.send(`${message.author} | Invalid Symbol!`).then(msg => setTimeout(() => msg.delete(), 5000));
+                            }
                         }
-                        else message.channel.send(`${message.author} | Invalid Symbol!`).then(msg => setTimeout(() => msg.delete(), 5000))
-                    }
-                    break
+                        break;
+            
+                    case 'remove':
+                        if (await checkIfSymbolExists(sym)) {
+                            await client.symbolModel.deleteOne({ symbol: sym });
+                            message.channel.send(`Successfully removed \`${sym}\` from the database!`).then(msg => setTimeout(() => msg.delete(), 5000));
+                        } else {
+                            message.channel.send(`${message.author} | Symbol does not exist in the database!`).then(msg => setTimeout(() => msg.delete(), 5000));
+                        }
+                        break;
 
-                case 'remove':
-
-                    if (await check_if_symbol_exists(sym))
-                        client.symbolModel.deleteOne({ symbol: sym }).then(res => message.channel.send(`Successfully removed \`${sym}\` from the database!`).then(msg => setTimeout(() => msg.delete(), 5000)))
-                    else
-                        message.channel.send(`${message.author} | Symbol does not exist in the database!`).then(msg => setTimeout(() => msg.delete(), 5000))
-                    break
+            
 
                 case 'list':
-                    client.symbolModel.find({}).then(res => {
+                    client.symbolModel.find({}).then(async res => {
                         if (!res)
                             message.channel.send(`Query returned NULL | Database is empty!`).then(msg => setTimeout(() => msg.delete(), 5000))
                         else {
@@ -68,11 +85,11 @@ module.exports = {
                                 .setTitle("Active Stock Symbols")
 
                             var POS = 1
-                            res.forEach(stock => {
-                                STOCK_EMBED.addFields({ name: `**${POS}**. \`${stock.symbol}\``, value: `------------` })
-                                POS++
-                            })
-                            message.channel.send({ embeds: [STOCK_EMBED] }).then(msg => setTimeout(() => msg.delete(), 25000))
+                            await Promise.all(res.map(async (stock) => {
+                                const price = await getCurrPrice(stock.symbol);
+                                STOCK_EMBED.addFields({ name: `**${POS}**. \`${stock.symbol}\``, value: `$${price}` });
+                                POS++;
+                            })).then(() => message.channel.send({ embeds: [STOCK_EMBED] }).then(msg => setTimeout(() => msg.delete(), 25000)));
                         }
 
                     })
