@@ -11,10 +11,14 @@ const client = new Client({
 const fs = require('fs')
 const mongoose = require('mongoose')
 require('dotenv').config()
+const axios = require('axios');
+const cheerio = require('cheerio');
 
 /*      GLOBALS       */
 const PREFIX = ','
 const ERROR_CHANNEL_ID = process.env.ERROR_CHANNEL_ID
+const GHOST_CHANNEL_ID = process.env.GHOST_CHANNEL_ID
+const MAIN_CHANNEL_ID = process.env.MAIN_CHANNEL_ID
 const PRESENCE_UPDATE_CHANNEL_ID = process.env.PRESENCE_CHANNEL_ID
 const COMMAND_FILES = fs.readdirSync("./commands").filter(file => file.endsWith('.js'))
 const deafenTimes = new Map()
@@ -46,12 +50,16 @@ module.exports.COMMANDS_EMBED = COMMANDS_EMBED
 module.exports.CHANNELS = client.channels
 module.exports.TEXT_CHANNELS = ['762009285705465872', '762009879673569310', '762009285705465874']
 module.exports.VOICE_CHANNELS = ['762009285957386240', '762009285957386241', '762009535334187059', '762009650513707028', '762009503050498100']
-module.exports.ROLES = ['762009965497024514', '762015812088365067', '762016135150436362', '762024356229677066', '762131777732608000']
+module.exports.ROLES = ['762015812088365067', '762016135150436362', '762024356229677066', '762131777732608000']
+module.exports.BOT_KNOWN_ROLES = client.roles
 module.exports.OWNER_ROLE = process.env.OWNER_ROLE
 module.exports.OWNER_ID = '247557493738176512'
 module.exports.STOCKS_CHANNEL_ID = process.env.STOCKS_CHANNEL_ID
 module.exports.symbolModel = symbol
+module.exports.EmbedBuilder = EmbedBuilder
 module.exports.DEAFEN_TIMES = deafenTimes
+module.exports.GHOST_CHANNEL_ID = GHOST_CHANNEL_ID
+module.exports.MAIN_CHANNEL_ID = MAIN_CHANNEL_ID
 
 
 /*     EVENT HANDLER(s)      */
@@ -60,7 +68,6 @@ client.once('ready', async () => {
     const GUILD = client.guilds.cache.get('762009285705465866')
     module.exports.GUILD = GUILD
     client.user.setStatus("dnd");
-
     const STATUS_MESSAGE = [`Prefix: ${PREFIX}`, "Ay Wassup Street", "Hi Brandon", "Gabe Deluca"]
     let i = 0
 
@@ -73,6 +80,9 @@ client.once('ready', async () => {
     }, 7000)
 
 })
+
+  
+  
 
 
 client.on('messageCreate', (message) => {
@@ -99,6 +109,7 @@ client.on('messageCreate', (message) => {
                 setTimeout(() => message.delete(), 3000)
         }
         catch(e) {
+            console.log(e)
              client.channels.cache.get(ERROR_CHANNEL_ID).send(`------------------\n**Invoker:** ${message.author}\n**Channel:** ${message.channel}\n**Occurrence:** *${date} | ${time}*\n**Output:** ${e}\n`)
              message.channel.send(`${author} | \`${CMD}\`Command not recognized. Try \`,commands\` for a list of commands`).then(msg => setTimeout(() => msg.delete(), 5000))
         }
