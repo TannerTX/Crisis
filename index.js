@@ -128,7 +128,7 @@ client.on('messageUpdate', (oldMsg, newMsg) => {
 
     const MSG_UPDATE_EMBED = new EmbedBuilder()
     .setColor("#7842f5")
-    .setTitle(`-Message Updated-`)
+    .setTitle(`Bro thought I wouldn't notice lmao`)
     .setTimestamp()
     // .setAuthor({ name: `${client.users.cache.get(.user.id).username}`, iconURL: `${USER.displayAvatarURL()}`, url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=1`})
 
