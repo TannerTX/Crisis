@@ -1,11 +1,12 @@
-const { Client, GatewayIntentBits, EmbedBuilder, Collection, ActivityType, Intents } = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder, Collection, ActivityType, Intents, Partials } = require('discord.js');
 const client = new Client({ 
+	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildPresences,
         GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.GuildVoiceStates
+        GatewayIntentBits.GuildVoiceStates,
         ] });
 
 const fs = require('fs')
@@ -117,6 +118,40 @@ client.on('messageCreate', (message) => {
     }
 
 })
+
+// Message Update event Handler
+client.on('messageUpdate', (oldMsg, newMsg) => {
+
+    let oldMsgContent = oldMsg.content
+    let newMsgContent = newMsg.content
+    // let msgAuthor = oldMsg.author.username
+
+    const MSG_UPDATE_EMBED = new EmbedBuilder()
+    .setColor("#7842f5")
+    .setTitle(`-Message Updated-`)
+    .setTimestamp()
+    // .setAuthor({ name: `${client.users.cache.get(.user.id).username}`, iconURL: `${USER.displayAvatarURL()}`, url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=1`})
+
+
+
+    if (oldMsgContent !== newMsgContent) {
+        
+        MSG_UPDATE_EMBED.addFields({ name:`Author`, value: `\`${oldMsg.member.nickname}\``})
+        MSG_UPDATE_EMBED.addFields({ name:`Channel`, value: `\`${oldMsg.channel.name}\``})
+        MSG_UPDATE_EMBED.addFields({ name:`Message Pre-Update`, value: `\`${oldMsgContent}\``})
+        MSG_UPDATE_EMBED.addFields({ name:`Message Post-Update`, value: `\`${newMsgContent}\``})
+
+        oldMsg.channel.send({ embeds: [MSG_UPDATE_EMBED] })
+        console.log(`MESSAGE CHANNEL: ${oldMsg.channel.name}`)
+        console.log(`AUTHOR: ${oldMsg.member.nickname}`)
+        console.log(`OLD MESSAGE: ${oldMsg.content}`)
+        console.log(`NEW MESSAGE: ${newMsg.content}`)
+    }
+
+})
+
+
+
 
 client.on('voiceStateUpdate', (oldState, newState) => {
     if (!newState.member || newState.member.user.bot) return;
