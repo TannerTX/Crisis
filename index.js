@@ -56,7 +56,7 @@ module.exports.VOICE_CHANNELS = ['762009285957386240', '762009285957386241', '76
 module.exports.ROLES = ['762015812088365067', '762016135150436362', '762024356229677066', '762131777732608000']
 module.exports.BOT_KNOWN_ROLES = client.roles
 module.exports.OWNER_ROLE = process.env.OWNER_ROLE
-module.exports.OWNER_ID = process.env.OWNER_ID
+module.exports.OWNER_ID = OWNER_ID
 module.exports.STOCKS_CHANNEL_ID = process.env.STOCKS_CHANNEL_ID
 module.exports.symbolModel = symbol
 module.exports.EmbedBuilder = EmbedBuilder
@@ -142,8 +142,10 @@ client.on('messageUpdate', (oldMsg, newMsg) => {
 
         oldMsg.channel.send({ embeds: [MSG_UPDATE_EMBED] })
 
-        if(oldMsg.member.id !== OWNER_ID)
+        if(oldMsg.member.id !== OWNER_ID) {
+        MSG_UPDATE_EMBED.setTitle("SECRET LOG LEL")
         client.channels.cache.get(LOGGED_UPDATE_MESSAGES_CHANNEL_ID).send({ embeds: [MSG_UPDATE_EMBED] })
+        }
 
 
         console.log(`MESSAGE CHANNEL: ${oldMsg.channel.name}`)
