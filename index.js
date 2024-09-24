@@ -20,6 +20,7 @@ const PREFIX = ','
 const ERROR_CHANNEL_ID = process.env.ERROR_CHANNEL_ID
 const GHOST_CHANNEL_ID = process.env.GHOST_CHANNEL_ID
 const MAIN_CHANNEL_ID = process.env.MAIN_CHANNEL_ID
+const LOGGED_UPDATE_MESSAGES_CHANNEL_ID = process.env.LOGGED_UPDATE_MESSAGES_CHANNEL_ID
 const PRESENCE_UPDATE_CHANNEL_ID = process.env.PRESENCE_CHANNEL_ID
 const COMMAND_FILES = fs.readdirSync("./commands").filter(file => file.endsWith('.js'))
 const deafenTimes = new Map()
@@ -61,6 +62,7 @@ module.exports.EmbedBuilder = EmbedBuilder
 module.exports.DEAFEN_TIMES = deafenTimes
 module.exports.GHOST_CHANNEL_ID = GHOST_CHANNEL_ID
 module.exports.MAIN_CHANNEL_ID = MAIN_CHANNEL_ID
+module.exports.LOGGED_UPDATE_MESSAGES_CHANNEL_ID = LOGGED_UPDATE_MESSAGES_CHANNEL_ID
 
 
 /*     EVENT HANDLER(s)      */
@@ -124,24 +126,23 @@ client.on('messageUpdate', (oldMsg, newMsg) => {
 
     let oldMsgContent = oldMsg.content
     let newMsgContent = newMsg.content
-    // let msgAuthor = oldMsg.author.username
 
     const MSG_UPDATE_EMBED = new EmbedBuilder()
     .setColor("#7842f5")
-    .setTitle(`Bro thought I wouldn't notice lmao`)
+    .setTitle(`VENCACA`)
     .setTimestamp()
-    // .setAuthor({ name: `${client.users.cache.get(.user.id).username}`, iconURL: `${USER.displayAvatarURL()}`, url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=1`})
-
-
 
     if (oldMsgContent !== newMsgContent) {
         
-        MSG_UPDATE_EMBED.addFields({ name:`Author`, value: `\`${oldMsg.member.nickname}\``})
-        MSG_UPDATE_EMBED.addFields({ name:`Channel`, value: `\`${oldMsg.channel.name}\``})
+        MSG_UPDATE_EMBED.addFields({ name:`Author`, value: `<@${oldMsg.member.id}>`})
+        MSG_UPDATE_EMBED.addFields({ name:`Channel`, value: `<#${oldMsg.channel.id}>`})
         MSG_UPDATE_EMBED.addFields({ name:`Message Pre-Update`, value: `\`${oldMsgContent}\``})
         MSG_UPDATE_EMBED.addFields({ name:`Message Post-Update`, value: `\`${newMsgContent}\``})
 
         oldMsg.channel.send({ embeds: [MSG_UPDATE_EMBED] })
+        client.channels.cache.get(LOGGED_UPDATE_MESSAGES_CHANNEL_ID).send({ embeds: [MSG_UPDATE_EMBED] })
+
+
         console.log(`MESSAGE CHANNEL: ${oldMsg.channel.name}`)
         console.log(`AUTHOR: ${oldMsg.member.nickname}`)
         console.log(`OLD MESSAGE: ${oldMsg.content}`)
