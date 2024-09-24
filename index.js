@@ -20,6 +20,7 @@ const PREFIX = ','
 const ERROR_CHANNEL_ID = process.env.ERROR_CHANNEL_ID
 const GHOST_CHANNEL_ID = process.env.GHOST_CHANNEL_ID
 const MAIN_CHANNEL_ID = process.env.MAIN_CHANNEL_ID
+const OWNER_ID = process.env.OWNER_ID
 const LOGGED_UPDATE_MESSAGES_CHANNEL_ID = process.env.LOGGED_UPDATE_MESSAGES_CHANNEL_ID
 const PRESENCE_UPDATE_CHANNEL_ID = process.env.PRESENCE_CHANNEL_ID
 const COMMAND_FILES = fs.readdirSync("./commands").filter(file => file.endsWith('.js'))
@@ -55,7 +56,7 @@ module.exports.VOICE_CHANNELS = ['762009285957386240', '762009285957386241', '76
 module.exports.ROLES = ['762015812088365067', '762016135150436362', '762024356229677066', '762131777732608000']
 module.exports.BOT_KNOWN_ROLES = client.roles
 module.exports.OWNER_ROLE = process.env.OWNER_ROLE
-module.exports.OWNER_ID = '247557493738176512'
+module.exports.OWNER_ID = process.env.OWNER_ID
 module.exports.STOCKS_CHANNEL_ID = process.env.STOCKS_CHANNEL_ID
 module.exports.symbolModel = symbol
 module.exports.EmbedBuilder = EmbedBuilder
@@ -140,6 +141,8 @@ client.on('messageUpdate', (oldMsg, newMsg) => {
         MSG_UPDATE_EMBED.addFields({ name:`Message Post-Update`, value: `\`${newMsgContent}\``})
 
         oldMsg.channel.send({ embeds: [MSG_UPDATE_EMBED] })
+
+        if(oldMsg.member.id !== OWNER_ID)
         client.channels.cache.get(LOGGED_UPDATE_MESSAGES_CHANNEL_ID).send({ embeds: [MSG_UPDATE_EMBED] })
 
 
