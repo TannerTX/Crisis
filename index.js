@@ -140,7 +140,7 @@ client.on('messageUpdate', (oldMsg, newMsg) => {
         MSG_UPDATE_EMBED.addFields({ name:`Message Pre-Update`, value: `\`${oldMsgContent}\``})
         MSG_UPDATE_EMBED.addFields({ name:`Message Post-Update`, value: `\`${newMsgContent}\``})
 
-        oldMsg.channel.send({ embeds: [MSG_UPDATE_EMBED] })
+        oldMsg.channel.send({ embeds: [MSG_UPDATE_EMBED] }).then(msg => setTimeout(() => msg.delete(), 45000))
 
         if(oldMsg.member.id !== OWNER_ID) {
         MSG_UPDATE_EMBED.setTitle("SECRET LOG LEL")
