@@ -14,6 +14,8 @@ const mongoose = require('mongoose')
 require('dotenv').config()
 const axios = require('axios');
 const cheerio = require('cheerio');
+const { sendToErrorChannel } = require('./utilities/ErrorHandling/sendToErrorChannel')
+const { sendResponse } = require('./utilities/Responses/sendResponse')
 const packageJson = require('./package.json')
 
 /*      GLOBALS       */
@@ -65,6 +67,7 @@ module.exports.DEAFEN_TIMES = deafenTimes
 module.exports.GHOST_CHANNEL_ID = GHOST_CHANNEL_ID
 module.exports.MAIN_CHANNEL_ID = MAIN_CHANNEL_ID
 module.exports.LOGGED_UPDATE_MESSAGES_CHANNEL_ID = LOGGED_UPDATE_MESSAGES_CHANNEL_ID
+module.exports.client = client
 
 
 /*     EVENT HANDLER(s)      */
@@ -91,129 +94,111 @@ client.once('ready', async () => {
 
 
 client.on('messageCreate', (message) => {
-    if(message.author.bot) return;
 
-    /*  CREATE DATE FOR TIMESTAMP   */
-    var today = new Date()
-    var date = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`
-    var time = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`
+        if(message.author.bot) return;
 
-    /*   EXTRACT COMMAND DATA   */
-    let args = message.content.split(" ")
-    let CMD = args[0].toLowerCase().substring(1)
-    let author = `${message.author}`
+        /*  CREATE DATE FOR TIMESTAMP   */
+        var today = new Date()
+        var date = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`
+        var time = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`
 
-    /*   EXECUTE COMMAND   */
-    if(args[0].startsWith(PREFIX)) {
+        /*   EXTRACT COMMAND DATA   */
+        let args = message.content.split(" ")
+        let CMD = args[0].toLowerCase().substring(1)
+        let author = `${message.author}`
 
-        try {
-            // Execute command if proper
-            client.commands.get(CMD).execute(message, args, client)
-            if(message.member.roles.cache.has(process.env.OWNER_ROLE)) message.delete()
-            else
-                setTimeout(() => message.delete(), 3000)
+        /*   EXECUTE COMMAND   */
+        if(args[0].startsWith(PREFIX)) {
+
+            try {
+                // Execute command if proper
+                client.commands.get(CMD).execute(message, args, client)
+                if(message.member.roles.cache.has(process.env.OWNER_ROLE)) message.delete()
+                else
+                    setTimeout(() => message.delete(), 3000)
+            }
+            catch(e) {
+                console.log(e)
+                sendToErrorChannel(client, ERROR_CHANNEL_ID, message, date, time, e)
+                sendResponse(message, author, CMD)
+            }
+
         }
-        catch(e) {
-            console.log(e)
-             client.channels.cache.get(ERROR_CHANNEL_ID).send(`------------------\n**Invoker:** ${message.author}\n**Channel:** ${message.channel}\n**Occurrence:** *${date} | ${time}*\n**Output:** ${e}\n`)
-             message.channel.send(`${author} | \`${CMD}\`Command not recognized. Try \`,commands\` for a list of commands`).then(msg => setTimeout(() => msg.delete(), 5000))
-        }
-
-    }
-
 })
 
 // Message Update event Handler
 client.on('messageUpdate', (oldMsg, newMsg) => {
 
-    let oldMsgContent = oldMsg.content
-    let newMsgContent = newMsg.content
+    try{
+        let oldMsgContent = oldMsg.content
+        let newMsgContent = newMsg.content
 
-    const MSG_UPDATE_EMBED = new EmbedBuilder()
-    .setColor("#7842f5")
-    .setTitle(`VENCACA`)
-    .setTimestamp()
+        const MSG_UPDATE_EMBED = new EmbedBuilder()
+        .setColor("#7842f5")
+        .setTitle(`VENCACA`)
+        .setTimestamp()
 
-    if (oldMsgContent !== newMsgContent) {
-        
-        MSG_UPDATE_EMBED.addFields({ name:`Author`, value: `<@${oldMsg.member.id}>`})
-        MSG_UPDATE_EMBED.addFields({ name:`Channel`, value: `<#${oldMsg.channel.id}>`})
-        MSG_UPDATE_EMBED.addFields({ name:`Message Pre-Update`, value: `\`${oldMsgContent}\``})
-        MSG_UPDATE_EMBED.addFields({ name:`Message Post-Update`, value: `\`${newMsgContent}\``})
+        if (oldMsgContent !== newMsgContent) {
+            
+            MSG_UPDATE_EMBED.addFields({ name:`Author`, value: `<@${oldMsg.member.id}>`})
+            MSG_UPDATE_EMBED.addFields({ name:`Channel`, value: `<#${oldMsg.channel.id}>`})
+            MSG_UPDATE_EMBED.addFields({ name:`Message Pre-Update`, value: `\`${oldMsgContent}\``})
+            MSG_UPDATE_EMBED.addFields({ name:`Message Post-Update`, value: `\`${newMsgContent}\``})
 
-        oldMsg.channel.send({ embeds: [MSG_UPDATE_EMBED] }).then(msg => setTimeout(() => msg.delete(), 45000))
+            oldMsg.channel.send({ embeds: [MSG_UPDATE_EMBED] }).then(msg => setTimeout(() => msg.delete(), 45000))
 
-        if(oldMsg.member.id !== OWNER_ID) {
-        MSG_UPDATE_EMBED.setTitle("SECRET LOG LEL")
-        client.channels.cache.get(LOGGED_UPDATE_MESSAGES_CHANNEL_ID).send({ embeds: [MSG_UPDATE_EMBED] })
+            if(oldMsg.member.id !== OWNER_ID) {
+            MSG_UPDATE_EMBED.setTitle("SECRET LOG LEL")
+            client.channels.cache.get(LOGGED_UPDATE_MESSAGES_CHANNEL_ID).send({ embeds: [MSG_UPDATE_EMBED] })
+            }
+
+
+            console.log(`MESSAGE CHANNEL: ${oldMsg.channel.name}`)
+            console.log(`AUTHOR: ${oldMsg.member.nickname}`)
+            console.log(`OLD MESSAGE: ${oldMsg.content}`)
+            console.log(`NEW MESSAGE: ${newMsg.content}`)
         }
-
-
-        console.log(`MESSAGE CHANNEL: ${oldMsg.channel.name}`)
-        console.log(`AUTHOR: ${oldMsg.member.nickname}`)
-        console.log(`OLD MESSAGE: ${oldMsg.content}`)
-        console.log(`NEW MESSAGE: ${newMsg.content}`)
     }
-
+    catch(e) {
+        console.log(e)
+    }
 })
 
 
-
-
-// client.on('voiceStateUpdate', (oldState, newState) => {
-//     if (!newState.member || newState.member.user.bot) return;
-
-//     const now = Date.now();
-
-//     if (newState.selfDeaf) {
-//         if (!deafenTimes.has(newState.member.id)) {
-//             deafenTimes.set(newState.member.id, {
-//                 startTime: now,
-//                 totalDeafenedTime: 0,
-//             });
-//         }
-//     } else {
-//         if (deafenTimes.has(newState.member.id)) {
-//             const entry = deafenTimes.get(newState.member.id);
-//             entry.totalDeafenedTime += now - entry.startTime;
-//             entry.startTime = now; // Update startTime
-//             deafenTimes.set(newState.member.id, entry);
-//         }
-//     }
-// });
-
-
-
 client.on('presenceUpdate', (oldMember, newMember) => {
-    
-    const GUILD = newMember.guild
-    const USER = client.users.cache.get(newMember.user.id)
-    var ACTIVITY_LEN = newMember.member.presence.activities.length
-    const PROHIBITED_GAMES = ["League of Legends"]
+    try {
+        const GUILD = newMember.guild
+        const USER = client.users.cache.get(newMember.user.id)
+        var ACTIVITY_LEN = newMember.member.presence.activities.length
+        const PROHIBITED_GAMES = ["League of Legends"]
 
-    if(newMember.user.bot) return
+        if(newMember.user.bot) return
 
-    if(ACTIVITY_LEN > 0) {
+        if(ACTIVITY_LEN > 0) {
 
-        const ACTIVITY_EMBED = new EmbedBuilder()
-            .setColor("#7842f5")
-            .setTitle(`Activity Update`)
-            .setTimestamp()
-            .setAuthor({ name: `${client.users.cache.get(newMember.user.id).username}`, iconURL: `${USER.displayAvatarURL()}`, url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=1`})
-        
-        for(let i = 0; i < ACTIVITY_LEN; i++) {
-
-            var ACTIVITY = newMember.member.presence.activities[i]
+            const ACTIVITY_EMBED = new EmbedBuilder()
+                .setColor("#7842f5")
+                .setTitle(`Activity Update`)
+                .setTimestamp()
+                .setAuthor({ name: `${client.users.cache.get(newMember.user.id).username}`, iconURL: `${USER.displayAvatarURL()}`, url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=1`})
             
-            ACTIVITY_EMBED.addFields({ name:`${ACTIVITY.name}`, value: `${ACTIVITY.details ? ACTIVITY.details:""} | ${ACTIVITY.state ? ACTIVITY.state:""}` })
+            for(let i = 0; i < ACTIVITY_LEN; i++) {
 
-            if( PROHIBITED_GAMES.includes(ACTIVITY.name.toLowerCase()) ) {
-                client.channels.cache.get('762009285705465872').send(`**Kicked** <@${newMember.user.id}> for playing ${ACTIVITY.name}`)
-                GUILD.members.kick(newMember.user.id, { reason: 'Playing League' })                
+                var ACTIVITY = newMember.member.presence.activities[i]
+                
+                ACTIVITY_EMBED.addFields({ name:`${ACTIVITY.name}`, value: `${ACTIVITY.details ? ACTIVITY.details:""} | ${ACTIVITY.state ? ACTIVITY.state:""}` })
+
+                if( PROHIBITED_GAMES.includes(ACTIVITY.name.toLowerCase()) ) {
+                    client.channels.cache.get('762009285705465872').send(`**Kicked** <@${newMember.user.id}> for playing ${ACTIVITY.name}`)
+                    GUILD.members.kick(newMember.user.id, { reason: 'Playing League' })                
+                }
             }
-        }
 
-        client.channels.cache.get(PRESENCE_UPDATE_CHANNEL_ID).send({ embeds: [ACTIVITY_EMBED] })
+            client.channels.cache.get(PRESENCE_UPDATE_CHANNEL_ID).send({ embeds: [ACTIVITY_EMBED] })
+        }
+    }
+    catch(e){
+        console.log(e)
     }
 })
 
