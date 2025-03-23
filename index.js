@@ -14,6 +14,7 @@ const mongoose = require('mongoose')
 require('dotenv').config()
 const axios = require('axios');
 const cheerio = require('cheerio');
+const packageJson = require('./package.json')
 
 /*      GLOBALS       */
 const PREFIX = ','
@@ -33,13 +34,13 @@ let COMMANDS_EMBED = new EmbedBuilder()
     .setTitle("Commands")
     .setAuthor({ name: 'TannerTX', iconURL: 'https://imgur.com/gvBJrqo.png', url: 'https://discord.js.org' })
 
-
-const Mongo_Connection = mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then((result) => {
-console.log("Successfully connected to the database!")
-}).catch((err) => console.log(err))
+// UNCOMMENT WHEN USING
+// const Mongo_Connection = mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then((result) => {
+// console.log("Successfully connected to the database!")
+// }).catch((err) => console.log(err))
 
 /*    MONGOOSE MODELS    */
-const symbol = require("./mongooseModels/stocks.js")
+// const symbol = require("./mongooseModels/stocks.js")
 
 /*      COMMAND DETECTION/CREATION       */
 for(const file of COMMAND_FILES) {
@@ -58,7 +59,7 @@ module.exports.BOT_KNOWN_ROLES = client.roles
 module.exports.OWNER_ROLE = process.env.OWNER_ROLE
 module.exports.OWNER_ID = OWNER_ID
 module.exports.STOCKS_CHANNEL_ID = process.env.STOCKS_CHANNEL_ID
-module.exports.symbolModel = symbol
+// module.exports.symbolModel = symbol  UNCOMMENT WHEN USING
 module.exports.EmbedBuilder = EmbedBuilder
 module.exports.DEAFEN_TIMES = deafenTimes
 module.exports.GHOST_CHANNEL_ID = GHOST_CHANNEL_ID
@@ -68,7 +69,7 @@ module.exports.LOGGED_UPDATE_MESSAGES_CHANNEL_ID = LOGGED_UPDATE_MESSAGES_CHANNE
 
 /*     EVENT HANDLER(s)      */
 client.once('ready', async () => {
-    console.log("Online!")
+    console.log(`Online! V${packageJson.version}`)
     const GUILD = client.guilds.cache.get('762009285705465866')
     module.exports.GUILD = GUILD
     client.user.setStatus("dnd");
@@ -159,27 +160,27 @@ client.on('messageUpdate', (oldMsg, newMsg) => {
 
 
 
-client.on('voiceStateUpdate', (oldState, newState) => {
-    if (!newState.member || newState.member.user.bot) return;
+// client.on('voiceStateUpdate', (oldState, newState) => {
+//     if (!newState.member || newState.member.user.bot) return;
 
-    const now = Date.now();
+//     const now = Date.now();
 
-    if (newState.selfDeaf) {
-        if (!deafenTimes.has(newState.member.id)) {
-            deafenTimes.set(newState.member.id, {
-                startTime: now,
-                totalDeafenedTime: 0,
-            });
-        }
-    } else {
-        if (deafenTimes.has(newState.member.id)) {
-            const entry = deafenTimes.get(newState.member.id);
-            entry.totalDeafenedTime += now - entry.startTime;
-            entry.startTime = now; // Update startTime
-            deafenTimes.set(newState.member.id, entry);
-        }
-    }
-});
+//     if (newState.selfDeaf) {
+//         if (!deafenTimes.has(newState.member.id)) {
+//             deafenTimes.set(newState.member.id, {
+//                 startTime: now,
+//                 totalDeafenedTime: 0,
+//             });
+//         }
+//     } else {
+//         if (deafenTimes.has(newState.member.id)) {
+//             const entry = deafenTimes.get(newState.member.id);
+//             entry.totalDeafenedTime += now - entry.startTime;
+//             entry.startTime = now; // Update startTime
+//             deafenTimes.set(newState.member.id, entry);
+//         }
+//     }
+// });
 
 
 
