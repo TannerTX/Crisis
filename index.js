@@ -102,11 +102,13 @@ client.on('messageCreate', (message) => {
         var date = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`
         var time = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`
 
+       // if(message.member.id === "150382150548455424")
+        //  message.react('1365067677332148276').catch(console.error);
         /*   EXTRACT COMMAND DATA   */
         let args = message.content.split(" ")
         let CMD = args[0].toLowerCase().substring(1)
         let author = `${message.author}`
-
+        
         /*   EXECUTE COMMAND   */
         if(args[0].startsWith(PREFIX)) {
 
@@ -145,7 +147,7 @@ client.on('messageUpdate', (oldMsg, newMsg) => {
             MSG_UPDATE_EMBED.addFields({ name:`Message Pre-Update`, value: `\`${oldMsgContent}\``})
             MSG_UPDATE_EMBED.addFields({ name:`Message Post-Update`, value: `\`${newMsgContent}\``})
 
-            oldMsg.channel.send({ embeds: [MSG_UPDATE_EMBED] }).then(msg => setTimeout(() => msg.delete(), 45000))
+            //oldMsg.channel.send({ embeds: [MSG_UPDATE_EMBED] }).then(msg => setTimeout(() => msg.delete(), 45000))
 
             if(oldMsg.member.id !== OWNER_ID) {
             MSG_UPDATE_EMBED.setTitle("SECRET LOG LEL")

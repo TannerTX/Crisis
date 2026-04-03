@@ -1,10 +1,20 @@
 const client = require("../index.js")
 
+// somewhere in your config:
+const VALID_RTC = new Set([
+  'brazil','hongkong','india','japan','rotterdam','singapore',
+  'south-korea','southafrica','sydney','us-central','us-east','us-south','us-west'
+]);
+
+// pick one, or null for auto
+const RTC_REGION = 'us-central'; // e.g. 'us-central' or null to clear override
+
+
 module.exports = {
     name: 'change',
     description: 'Changes the theme of channels & roles',
     usage: ',change <theme>',
-    execute(message, args) {
+    async execute(message, args) {
         var theme = args[1].toLowerCase()
         let TEXT_CHANGE = []
         let VOICE_CHANGE = []
@@ -327,18 +337,44 @@ module.exports = {
         try {
           if (message.member.roles.cache.has(client.OWNER_ROLE)) {
 
-            for (const [INDEX, ELEMENT] of client.TEXT_CHANNELS.entries())
-              client.CHANNELS.cache.get(ELEMENT).setName(TEXT_CHANGE[INDEX]);
-
-            for (const [INDEX, ELEMENT] of client.VOICE_CHANNELS.entries())
-              client.CHANNELS.cache.get(ELEMENT).setName(VOICE_CHANGE[INDEX]);
-
-            for (const [INDEX, ELEMENT] of client.ROLES.entries())
-              client.GUILD.roles.cache.get(ELEMENT).setName(ROLES_CHANGE[INDEX]);
-          } else
-            message.channel.send(
-              `${message.author} | Insufficient Permissions!`
+            // rename text channels
+            await Promise.all(
+              client.TEXT_CHANNELS.map((id, i) => {
+                const ch = client.CHANNELS.cache.get(id);
+                return ch?.setName(TEXT_CHANGE[i]);
+              })
             );
+
+            // rename voice channels + set RTC region
+            await Promise.all(
+              client.VOICE_CHANNELS.map((id, i) => {
+                const ch = client.CHANNELS.cache.get(id);
+                if (!ch) return;
+
+                // safety: only apply to voice/stage types
+                const t = ch.type;
+                const isVoice =
+                  t === 2 /* GuildVoice */ || t === 13 /* GuildStageVoice */;
+
+                // pick final region (null == auto). Validate if not null.
+                const region =
+                  RTC_REGION === null || VALID_RTC.has(RTC_REGION) ? RTC_REGION : null;
+
+                const ops = [];
+                ops.push(ch.setName(VOICE_CHANGE[i]));
+                if (isVoice) ops.push(ch.setRTCRegion(region)); // null clears override
+                return Promise.all(ops);
+              })
+            );
+
+            // rename roles
+            await Promise.all(
+              client.ROLES.map((id, i) => client.GUILD.roles.cache.get(id)?.setName(ROLES_CHANGE[i]))
+            );
+
+          } else {
+            await message.channel.send(`${message.author} | Insufficient Permissions!`);
+          }
         } catch (error) {
           console.log(`Something farted\n\n\n${error}`);
         }
